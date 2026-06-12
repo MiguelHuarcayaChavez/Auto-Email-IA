@@ -1,0 +1,103 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f0f2f5;
+    margin: 0;
+    padding: 20px;
+    color: #333;
+}
+
+.container {
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+header {
+    background: #1a365d;
+    color: white;
+    padding: 20px 30px;
+    border-radius: 10px;
+    margin-bottom: 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+header h1 {
+    margin: 0 0 5px 0;
+    font-size: 24px;
+}
+
+header p {
+    margin: 0;
+    font-size: 14px;
+    opacity: 0.8;
+    width: 100%;
+}
+
+#btn-refresh {
+    background-color: #ff6c37; /* Naranja corporativo n8n */
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: bold;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.2s;
+    margin-top: 10px;
+}
+
+#btn-refresh:hover {
+    background-color: #e55a2b;
+}
+
+.status-message {
+    text-align: center;
+    font-size: 16px;
+    font-weight: bold;
+    padding: 20px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+}
+
+.error-message {
+    color: #c53030;
+    background: #fff5f5;
+    border: 1px solid #fed7d7;
+}
+
+.grid-container {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+}
+
+.report-card {
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+    border-left: 5px solid #ff6c37;
+    transition: transform 0.2s;
+}
+
+.report-card:hover {
+    transform: translateY(-2px);
+}
+
+.card-header {
+    font-size: 13px;
+    color: #718096;
+    margin-bottom: 12px;
+    border-bottom: 1px solid #edf2f7;
+    padding-bottom: 5px;
+}
+
+.card-body {
+    font-size: 15px;
+    line-height: 1.6;
+    white-space: pre-line; /* Clave para respetar los saltos de línea y markdown de la IA */
+}

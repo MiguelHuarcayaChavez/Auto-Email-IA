@@ -1,0 +1,246 @@
+{
+  "name": "Email IA Workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "filters": {
+          "readStatus": "unread"
+        },
+        "options": {
+          "downloadAttachments": true
+        }
+      },
+      "type": "n8n-nodes-base.microsoftOutlookTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "8a4ae435-baa9-4635-b2f8-7b20684c553b",
+      "name": "Microsoft Outlook Trigger",
+      "credentials": {
+        "microsoftOutlookOAuth2Api": {
+          "id": "9C9IppyDeWGbhzZH",
+          "name": "Microsoft Outlook OAuth2 API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "pdf",
+        "binaryPropertyName": "attachment_0",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        208,
+        0
+      ],
+      "id": "ba34431f-3cfe-4407-a413-7283cb7bc78b",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Actúa como un asistente médico experto en triaje. Analiza el contenido del correo y el texto del documento adjunto que te proporciono. Devuelve un resumen con: 1) Resumen del caso, 2) Servicio solicitado (¿Qué especialidad médica están solicitando?), 3) Servicio recomendado por ti (¿Qué especialidad médica deberia encargarse del caso? y 4) Recomendación de tratamiento.\n\nInformación de documentos:\n{{ $json.texto_para_ia }}\n\nAsunto de Emisor: {{ $('Microsoft Outlook Trigger').item.json.subject }}\n\nCuerpo de correo: {{ $('Microsoft Outlook Trigger').item.json.bodyPreview }}\n",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        624,
+        0
+      ],
+      "id": "5df5df0b-ead0-4785-a8e1-b597d590f6e0",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": "llama-3.1-8b-instant",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGroq",
+      "typeVersion": 1,
+      "position": [
+        496,
+        272
+      ],
+      "id": "24e4a410-8e4e-48a5-9dac-8d2ca40a28bc",
+      "name": "Groq Chat Model",
+      "credentials": {
+        "groqApi": {
+          "id": "8yxQJT3BaD5YaiQx",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "language": "pythonNative",
+        "pythonCode": "for item in _items:\n    # 1. Extraemos el texto completo que viene del nodo PDF anterior\n    texto_completo = item[\"json\"].get(\"text\", \"\")\n    \n    # 2. Cortamos el texto para quedarnos solo con el inicio (primeros 3000 caracteres)\n    texto_recortado = texto_completo[:3000]\n    \n    # 3. Guardamos este texto limpio en una nueva propiedad para que la reciba Groq\n    item[\"json\"][\"texto_para_ia\"] = texto_recortado\n\n# Devolvemos el elemento modificado a n8n\nreturn _items"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        416,
+        0
+      ],
+      "id": "033046dc-6a3e-4d07-b2fc-2a75d5c8614f",
+      "name": "Code in Python"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1r81ndRK_ubZ8a8l5Q_cLS_9bSAKuMk_VqQL0REXnT4o",
+          "mode": "list",
+          "cachedResultName": "Interconsultas Procesadas",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1r81ndRK_ubZ8a8l5Q_cLS_9bSAKuMk_VqQL0REXnT4o/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Hoja 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1r81ndRK_ubZ8a8l5Q_cLS_9bSAKuMk_VqQL0REXnT4o/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Correo Proveniente": "={{ $('Microsoft Outlook Trigger').item.json.from }}",
+            "Resultado Analisis": "={{ $json.output }}",
+            "Fecha": "={{ $now }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Fecha",
+              "displayName": "Fecha",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Correo Proveniente",
+              "displayName": "Correo Proveniente",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Resultado Analisis",
+              "displayName": "Resultado Analisis",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        976,
+        0
+      ],
+      "id": "de24a807-5095-47c2-a6ab-659434e619f9",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "sQfwEcaSRRKDpamj",
+          "name": "Google Sheets OAuth2 API"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Microsoft Outlook Trigger": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Code in Python",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in Python": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "cd447369-6bad-476b-91d7-ef66d5dfe352",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "45fda74f464318961cc230abfc7eb8104e303a6cc026d4ab9ba21d9cc62cabde"
+  },
+  "nodeGroups": [],
+  "id": "mIYzoZ20ljjax0Sd",
+  "tags": []
+}

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Historial de Tele-Interconsultas</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Panel de Tele-Interconsultas</h1>
+        <p>Datos extraídos en tiempo real desde el almacenamiento automatizado por n8n.</p>
+        <button id="btn-refresh" onclick="cargarInterconsultas()">Actualizar Datos</button>
+    </header>
+
+    <main>
+        <div id="loading" class="status-message">Cargando reportes médicos...</div>
+        <div id="error" class="status-message error-message" style="display: none;">Hubo un error al conectar con el servidor de datos.</div>
+        
+        <!-- Aquí se inyectarán las tarjetas dinámicamente -->
+        <div id="cards-container" class="grid-container"></div>
+    </main>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
